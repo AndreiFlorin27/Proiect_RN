@@ -3,7 +3,7 @@
 **Disciplina:** Rețele Neuronale  
 **Instituție:** UNSTPB
 **Student:** Pufu Andrei-Florin
-**Data:** 25/11/2025
+**Data:** 12/12/2025
 
 ---
 
@@ -38,29 +38,36 @@ project-name/
 
 ##  2. Descrierea Setului de Date
 
-Setul de date este destinat antrenării Rețelei Neuronale (YOLO) pentru sarcina de Detecție a Obiectelor (clasa "person").
+Setul de date este destinat detectiei preliminare folosind YOLO urmata de antrenarea propriei retele neuronale pentru sarcina de actualizare a treiectoriei in functie de pozitia oamenilor.
 
 ### 2.1 Sursa datelor
 
-* **Origine:** Senzor Lidar, Camera (în format sincronizat).
-* **Modul de achiziție:** Senzori reali
-* **Perioada / condițiile colectării:** Noiembrie 2025 - Decembrie 2025
+* **Origine:** Senzori reali (Lidar, Cameră, Odometrie, IMU, Baterie) în format sincronizat.
+* **Modul de achiziție:** Înregistrare ROS 2 Bag (topicuri multiple, capturate Off-Board).
+* **Perioada / condițiile colectării:** Decembrie 2025
 
 ### 2.2 Caracteristicile dataset-ului
 
 * **Număr total de observații:** 300 cadre (pentru imagini) / ~2 ore de înregistrare.
-* **Număr de caracteristici (features):** [Ex: 12]
-* **Tipuri de date:** Imagini
-* **Format fișiere:** YOLO format (Imagini .jpg + Fişiere de adnotare .txt)
+* **Număr de caracteristici (features):** 11 Topicuri ROS 2 (pe lângă TF).
+* **Tipuri de date:** Imagini, LaserScan, Odometrie, Stare Baterie, IMU.
+* **Format fișiere:** Data Base
 
 ### 2.3 Descrierea fiecărei caracteristici
 
-| **Caracteristică** | **Tip** | **Unitate** | **Descriere** | **Domeniu valori** |
-|-------------------|---------|-------------|---------------|--------------------|
-|  | numeric | mm | [...] | 0–150 |
-| feature_2 | categorial | – | [...] | {A, B, C} |
-| feature_3 | numeric | m/s | [...] | 0–2.5 |
-| ... | ... | ... | ... | ... |
+| **Caracteristică (Topic)** | **Tip** | **Unitate** | **Descriere** | **Domeniu valori** |
+|---------------------------|---------|-------------|---------------|--------------------|
+| /camera/image_raw/compressed | `sensor_msgs/Image` | Pixeli | Fluxul video al camerei (sursa principală YOLO). | 0–255 |
+| /scan | `sensor_msgs/LaserScan` | m / rad | Date de distanță de la senzorul LiDAR. | 0.1 – MaxRange |
+| /tf | `tf2_msgs/TFMessage` | Diverse | Transformări dinamice (mișcare). | Variază |
+| **/tf_static** | `tf2_msgs/TFMessage` | Diverse | **Calibrarea statică** (Camera-LiDAR). Date extrase. | Fixed (R/T) |
+| /diff_drive_controller/odom | `nav_msgs/Odometry` | m / rad | Odometria robotului (poziție estimată local). | Variază |
+| /amcl_pose | `geometry_msgs/Pose...`| m / rad | Poziția robotului estimată global. | Variază |
+| /imu/data | `sensor_msgs/Imu` | rad/s, m/s² | Date de la unitatea de măsură inerțială. | Variază |
+| /rear_battery_state | `sensor_msgs/BatteryState`| V / % | Starea bateriei din spate. | 0–100% |
+| /front_battery_state | `sensor_msgs/BatteryState`| V / % | Starea bateriei din față. | 0–100% |
+| /cmd_vel | `geometry_msgs/Twist` | m/s, rad/s | Comenzi de viteză. | -Max – +Max |
+| /joint_states | `sensor_msgs/JointState` | rad | Starea roților. | Variază |
 
 **Fișier recomandat:**  `data/README.md`
 
